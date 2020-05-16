@@ -1,12 +1,16 @@
 import 'package:cadastro_cidades_covid/banco/db_helper.dart';
 import 'package:cadastro_cidades_covid/componentes/list_cidade_comp.dart';
 import 'package:cadastro_cidades_covid/model/cidade.dart';
+import 'package:cadastro_cidades_covid/routes/rotas_app.dart';
 import 'package:flutter/material.dart';
 
 class ListaCidades extends StatefulWidget {
+  
   @override
   _ListaCidadesState createState() => _ListaCidadesState();
 }
+
+
 
 class _ListaCidadesState extends State<ListaCidades> {
  
@@ -17,12 +21,16 @@ class _ListaCidadesState extends State<ListaCidades> {
   @override
   void initState(){
     super.initState();
-    db.pegaTodasCidades().then((lista){
+    atualizaLista();//reciclagem de codigo
+  } 
+
+void atualizaLista(){
+  db.pegaTodasCidades().then((lista){
       setState(() {//atualiza interface com os dados do BD
         listaCidades = lista;
       });
     });
-  } 
+}
   
 
  @override
@@ -34,21 +42,24 @@ class _ListaCidadesState extends State<ListaCidades> {
           IconButton(
             icon: Icon(Icons.add_circle),
             color: Colors.green,
-            onPressed: () {},
+            onPressed: () {
+                _insereCidade();
+                
+            },
           )
         ],
       ),
       body: ListView.builder(
         itemCount: listaCidades.length,
-        itemBuilder: (cotexto, index) =>ListCidadeComp(listaCidades,index),
-        /*itemBuilder: (contexto, index){
+        //itemBuilder: (cotexto, index) =>ListCidadeComp(listaCidades,index),
+        itemBuilder: (contexto, index){
           return _listaCidades(contexto,index);
-        },*/
+        },
         ),  
     );
   }
 
-  /*_listaCidades(BuildContext contexto, int index){
+  _listaCidades(BuildContext contexto, int index){
     final avatarCidade = CircleAvatar(child: Icon(Icons.account_balance));
     return ListTile(
       leading: avatarCidade,
@@ -61,7 +72,9 @@ class _ListaCidadesState extends State<ListaCidades> {
             IconButton(//editar
             icon: Icon(Icons.edit),
             color: Colors.blue,
-            onPressed: (){},
+            onPressed: (){
+              _editaCidade(index);
+            },
           ),
           IconButton(//excluir
             icon: Icon(Icons.delete_forever),
@@ -72,5 +85,26 @@ class _ListaCidadesState extends State<ListaCidades> {
         ),
       ),
     );
-  }*/
+  }
+
+  //metodo que verifica o retorno de uma incersao e atualiza o estado da lista
+  void _insereCidade() async{
+    final retornoRecebido = await Navigator.of(context).pushNamed(//coloca uma tela em cima da outra
+      AppRotas.CIDADE_FORM);
+    if (retornoRecebido != null){
+      atualizaLista();
+    }
+
+  }
+
+  void _editaCidade(index) async{
+    final retornoRecebido = await Navigator.of(context).pushNamed(//coloca uma tela em cima da outra
+      AppRotas.CIDADE_FORM,
+      arguments: listaCidades[index]
+    );
+    if (retornoRecebido != null){
+      atualizaLista();
+    }
+
+  }
 }

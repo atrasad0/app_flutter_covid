@@ -1,4 +1,5 @@
 import 'package:cadastro_cidades_covid/model/cidade.dart';
+import 'package:cadastro_cidades_covid/routes/rotas_app.dart';
 import 'package:flutter/material.dart';
 
 class ListCidadeComp extends StatelessWidget {
@@ -6,7 +7,7 @@ class ListCidadeComp extends StatelessWidget {
    List<Cidade> listaCidades = List<Cidade>();
    int index;
 
-  ListCidadeComp(this.listaCidades,this.index);//construtor recebendo o tipo lista e o indice
+  ListCidadeComp(this.listaCidades,this.index);//construtor recebendo o tipo lista e o index
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +23,12 @@ class ListCidadeComp extends StatelessWidget {
             IconButton(//editar
             icon: Icon(Icons.edit),
             color: Colors.blue,
-            onPressed: (){},
+            onPressed: (){
+                Navigator.of(context).pushNamed(//coloca uma tela em cima da outra
+                AppRotas.CIDADE_FORM,
+                arguments: listaCidades[index]
+              );
+            },
           ),
           IconButton(//excluir
             icon: Icon(Icons.delete_forever),

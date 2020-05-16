@@ -1,3 +1,5 @@
+import 'package:cadastro_cidades_covid/routes/rotas_app.dart';
+import 'package:cadastro_cidades_covid/view/cidade_form.dart';
 import 'package:cadastro_cidades_covid/view/lista_cidade.dart';
 import 'package:flutter/material.dart';
 
@@ -18,6 +20,9 @@ class MyApp extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       home: ListaCidades(),
+      routes: {
+        AppRotas.CIDADE_FORM: (_) => CidadeForm()
+      },
     );
   }
 }
