@@ -6,12 +6,11 @@ class ListCidadeComp extends StatelessWidget {
    List<Cidade> listaCidades = List<Cidade>();
    int index;
 
-  ListCidadeComp(this.listaCidades,this.index);//construtor recebendo o tipo cidade
+  ListCidadeComp(this.listaCidades,this.index);//construtor recebendo o tipo lista e o indice
 
   @override
   Widget build(BuildContext context) {
     final avatarCidade = CircleAvatar(child: Icon(Icons.account_balance));
-    var nome = listaCidades[index].nomeCidade;
     return ListTile(
       leading: avatarCidade,
       title: Text(listaCidades[index].nomeCidade),//usando atributos de cidade

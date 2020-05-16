@@ -1,26 +1,32 @@
-import 'package:cadastro_cidades_covid/banco/cidades_teste.dart';
 import 'package:cadastro_cidades_covid/banco/db_helper.dart';
 import 'package:cadastro_cidades_covid/componentes/list_cidade_comp.dart';
 import 'package:cadastro_cidades_covid/model/cidade.dart';
 import 'package:flutter/material.dart';
 
-class ListaCidades extends StatelessWidget {
+class ListaCidades extends StatefulWidget {
   @override
-  Widget build(BuildContext context) {
+  _ListaCidadesState createState() => _ListaCidadesState();
+}
 
-  //final cidade = {...CidadeTeste};//spread copia do array
+class _ListaCidadesState extends State<ListaCidades> {
+ 
   DBHelper db = DBHelper();
   List<Cidade> listaCidades = List<Cidade>();
 
-  //Cidade c = Cidade(nomeCidade: 'Sao Carlos', descriQuarentena: 'teste', infectados: 5, recuperados: 5);
-  //db.insereCidade(c);
+  //espera o componente carregar para fazer esse metodo
+  @override
+  void initState(){
+    super.initState();
+    db.pegaTodasCidades().then((lista){
+      setState(() {//atualiza interface com os dados do BD
+        listaCidades = lista;
+      });
+    });
+  } 
   
-  db.pegaTodasCidades().then((lista){
-    print(lista);
-    listaCidades = lista;
-  });
 
-
+ @override
+  Widget build(BuildContext context) {
     return Scaffold(//Tela
       appBar: AppBar(
         title: Text("Cidades COVID 19"),
@@ -35,7 +41,36 @@ class ListaCidades extends StatelessWidget {
       body: ListView.builder(
         itemCount: listaCidades.length,
         itemBuilder: (cotexto, index) =>ListCidadeComp(listaCidades,index),
+        /*itemBuilder: (contexto, index){
+          return _listaCidades(contexto,index);
+        },*/
         ),  
     );
   }
+
+  /*_listaCidades(BuildContext contexto, int index){
+    final avatarCidade = CircleAvatar(child: Icon(Icons.account_balance));
+    return ListTile(
+      leading: avatarCidade,
+      title: Text(listaCidades[index].nomeCidade),//usando atributo nome da lista de cidade
+      subtitle: Text(listaCidades[index].descriQuarentena),
+      trailing: Container(
+        width:100,
+        child: Row(// icone para editar e excluir
+          children: <Widget>[
+            IconButton(//editar
+            icon: Icon(Icons.edit),
+            color: Colors.blue,
+            onPressed: (){},
+          ),
+          IconButton(//excluir
+            icon: Icon(Icons.delete_forever),
+            color: Colors.red,
+            onPressed: (){},
+          )
+        ],
+        ),
+      ),
+    );
+  }*/
 }
