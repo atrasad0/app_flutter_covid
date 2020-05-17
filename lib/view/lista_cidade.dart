@@ -1,5 +1,4 @@
 import 'package:cadastro_cidades_covid/banco/db_helper.dart';
-import 'package:cadastro_cidades_covid/componentes/list_cidade_comp.dart';
 import 'package:cadastro_cidades_covid/model/cidade.dart';
 import 'package:cadastro_cidades_covid/routes/rotas_app.dart';
 import 'package:flutter/material.dart';
@@ -22,6 +21,7 @@ class _ListaCidadesState extends State<ListaCidades> {
   void initState(){
     super.initState();
     atualizaLista();//reciclagem de codigo
+    _adicionaCidadeTeste(); //adiciona uma cidade para teste para poder ja visualizar layout e tals
   } 
 
 void atualizaLista(){
@@ -41,7 +41,7 @@ void atualizaLista(){
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.add_circle),
-            color: Colors.green,
+            color: Colors.black,
             onPressed: () {
                 _insereCidade();
                 
@@ -79,7 +79,27 @@ void atualizaLista(){
           IconButton(//excluir
             icon: Icon(Icons.delete_forever),
             color: Colors.red,
-            onPressed: (){},
+            onPressed: (){
+              showDialog(
+                context: contexto,
+                builder: (contexto) => AlertDialog( //apartir do contexto o builder cria algo que eu quero, no caso uma mensagem
+                  title: Text('Deseja excluir essa cidade?'),
+                  actions: <Widget>[
+                    FlatButton(onPressed: (){
+                      Navigator.of(contexto).pop();
+                    }, //funcao vazia para nao fazer nada apnesa fechando o modalzinho
+                      child: Text('NÃO!'),
+                      ),
+                      FlatButton(onPressed: (){
+                        _excluiCidade(listaCidades[index].id,index);
+                         Navigator.of(contexto).pop();
+                      },
+                      child: Text('Sim'),
+                      ),
+                  ],
+                ),
+              );
+            },
           )
         ],
         ),
@@ -98,13 +118,34 @@ void atualizaLista(){
   }
 
   void _editaCidade(index) async{
-    final retornoRecebido = await Navigator.of(context).pushNamed(//coloca uma tela em cima da outra
+    final retornoRecebido = await Navigator.of(context).pushNamed(
       AppRotas.CIDADE_FORM,
       arguments: listaCidades[index]
     );
     if (retornoRecebido != null){
       atualizaLista();
     }
-
   }
+
+  void _excluiCidade(idCidadeBanco,indexLista)async{//o id da cidade é diferente do id cidade banco
+    if (indexLista != null){
+      setState(() {
+        listaCidades.removeAt(indexLista);
+        db.excluiCidade(idCidadeBanco);
+       
+      });
+      
+    }
+  }
+
+ 
+ void _adicionaCidadeTeste(){   
+
+      if (listaCidades.length == 0){
+        Cidade c = Cidade(nomeCidade: 'São Carlos', descriQuarentena: 'Quarentena começou em 20/03/2020', infectados: 38, recuperados: 30);
+        db.insereCidade(c);
+        atualizaLista();
+      }
+    }
+
 }

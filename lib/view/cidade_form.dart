@@ -10,8 +10,7 @@ class CidadeForm extends StatefulWidget {
 DBHelper db = DBHelper();//instancia do banco
 final _formulario = GlobalKey<FormState>(); //global key referente a key do meu formulario para poder acessar os values digitados
 final Map<String, Object> _formularioValores = {}; //map object pois posso ter string int e tals
-List<Cidade> listaCidades = List<Cidade>();
-const SUCESSO = "sucesso";
+int retorno;
 
 void _carregaFormulario(Cidade cidadeSelecionada){
   _formularioValores['id'] = cidadeSelecionada.id;
@@ -21,16 +20,29 @@ void _carregaFormulario(Cidade cidadeSelecionada){
   _formularioValores['recuperados'] = cidadeSelecionada.recuperados.toString();
 }
 
+void _limpaFormulario(){//GAMBIARRA
+  _formularioValores['id'] = null;
+  _formularioValores['nome_cidade'] = null;
+  _formularioValores['desc_quarentena'] = null;
+  _formularioValores['infectados'] = null;
+  _formularioValores['recuperados'] = null;
+}
+
 
 class _CidadeFormState extends State<CidadeForm> {
   @override
   Widget build(BuildContext context) {
     bool editando = false;
-    Cidade cidadeSelecionada = ModalRoute.of(context).settings.arguments;//pegando argumento da lista que foi passado usado para editar
+    Cidade cidadeSelecionada = ModalRoute.of(context).settings.arguments;//pegando argumento da lista que foi passado usado metodo para editar
+
     if (cidadeSelecionada !=null){
       _carregaFormulario(cidadeSelecionada);
       editando = true;
+    }else{
+      //TODO: nao tive tempo de tentar trocar minha classe para stateless, troquei começou quebrar umas coisas ai deixei quieto
+      _limpaFormulario();
     }
+    
     return Scaffold(
       appBar: AppBar(
         title: Text('formulario cidade'),
@@ -38,18 +50,19 @@ class _CidadeFormState extends State<CidadeForm> {
           IconButton(
             icon: Icon(Icons.save),
             onPressed: (){
-              //agora posso acessar meu formulario no onPressed
+              //agora posso acessar meu formulario com onPressed
               bool valida = _formulario.currentState.validate();
 
               if (valida){
                 _formulario.currentState.save(); //metodo que posso chamar dentro de cada um dos filds
                 Cidade cidade = Cidade (
-                  //nao passo o id pois é auto increment
+                  //nao passo o id pois é auto increment, no caso de um cadastro
                    nomeCidade: _formularioValores['nome_cidade'],
                    descriQuarentena: _formularioValores['desc_quarentena'],
                    infectados: _formularioValores['infectados'],
                    recuperados: _formularioValores['recuperados']
                 );
+
                 if (editando == false){
                   db.insereCidade(cidade); //insere a cidade na lista
                 }else{
@@ -57,7 +70,7 @@ class _CidadeFormState extends State<CidadeForm> {
                   cidade.id = _formularioValores['id'];
                   db.alteraCidade(cidade); //altera cidade
                 }
-                Navigator.of(context).pop("sucesso");//retira a pagina da pilha
+                Navigator.of(context).pop("retorno");//retira a pagina da pilha
               }              
             }
           ),
@@ -69,7 +82,7 @@ class _CidadeFormState extends State<CidadeForm> {
            child: Column(
              children: <Widget>[//array de widget
                TextFormField(
-                 initialValue: _formularioValores['nome_cidade'],
+                 initialValue: _formularioValores['nome_cidade'], //se editando for true, esses valores vao ser adicionados e em initValue tera o valor do cidade selecionada 
                  decoration: InputDecoration(labelText: 'Nome Cidade'), //lbl placeholder
                  validator: (value){
                     if (value == null || value.trim().isEmpty)
@@ -100,6 +113,12 @@ class _CidadeFormState extends State<CidadeForm> {
                    if (value == null || value.trim().isEmpty)
                       return 'Por favor insira numeros infectados';
 
+                  //verificando se foi digitado numeros
+                   try{
+                      int.parse(value);
+                    }catch(erro){
+                      return 'Digite numeros';
+                    }
                     return null;  
                  },
                  onSaved: (value)=>_formularioValores['infectados'] = int.parse(value),
@@ -110,8 +129,14 @@ class _CidadeFormState extends State<CidadeForm> {
                   validator: (value){
                    if (value == null || value.trim().isEmpty)
                       return 'Por favor insira numeros recuperados';
+                    
+                    try{
+                      int.parse(value);
+                    }catch(erro){
+                      return 'Digite numeros';
+                    }
 
-                    return null;  
+                    return null;
                  },
                  onSaved: (value)=>_formularioValores['recuperados'] = int.parse(value),
                ),

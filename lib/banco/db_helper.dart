@@ -60,7 +60,7 @@ class DBHelper {
 
     Database db = await this.dataBase;
     var resultado = await db.insert(TABELA, cidade.toMap());
-    return resultado;//retornando o id do contato
+    return resultado;//retornando o id da cidade
   }
 
   //retorna uma cidade pelo ID
@@ -114,7 +114,7 @@ class DBHelper {
     Database db = await this.dataBase;  
     List<Map<String, dynamic>> yuri = await db.rawQuery('SELECT COUNT (*) FROM $TABELA');
     int resultado = firstIntValue(yuri);//primeiro valor do map 
-    return resultado;//retornando o id do contato
+    return resultado;//retornando qtd
   }
 
   Future close() async{
